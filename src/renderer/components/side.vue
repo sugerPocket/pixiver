@@ -1,13 +1,6 @@
 <template lang='jade'>
-  #login-wrapper
-    main.login-main
-      img#logo(src="~@/assets/logo.png" alt="electron-vue")
-      form.form(role='form' v-on:submit.prevent='login($event)')
-        .form-group
-          input.form-control(type='text' v-model='pixiv_id' placeholder='Pixiv Id')
-          
-          input.form-control(type='password' v-model='password' placeholder='Password')
-        button.submit.btn.btn-block.btn-primary(type="submit") Sign in
+  #side
+    
 </template>
 
 <script>

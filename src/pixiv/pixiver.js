@@ -66,7 +66,14 @@ class Pagent {
 
   async download (urls) {
     let result = []
-    result = await Promise.all(urls.map(url => this.api.download(url)))
+    result = await Promise.all(urls.map(
+      url => this.api
+        .download(url)
+        .then(
+          result => URL.createObjectURL(new Blob([result.body], { type: result.type }))
+        )
+      )
+    )
     return result
   }
 }

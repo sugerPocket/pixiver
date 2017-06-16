@@ -27,14 +27,13 @@
         this.$pixiv
           .exportResources(urls.map(url => url.original || url.original_image_url))
           .then(images => {
-            console.log(images)
-            this.urls = images.map(val => URL.createObjectURL(new Blob([val.body], { type: val.type })))
+            this.urls = images
           })
           .catch(err => console.log(err))
       },
       fetch () {
         this.$pixiv
-          .queryUrls('byRank', undefined, null, 0, 10)
+          .queryUrls('byRank', new Date(2017, 6, 13), null, 0, 10)
           .then(urls => {
             this.originalUrls = urls
           })
@@ -47,5 +46,5 @@
 <style lang='sass'>
   body
     color: white
-    background-color: #2f3241
+    background-color: #2b2e3b
 </style>
