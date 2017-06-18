@@ -4,7 +4,7 @@
       img#logo(src="~@/assets/logo.png" alt="electron-vue")
       form.form(role='form' v-on:submit.prevent='login($event)')
         .form-group
-          input.form-control(type='text' v-model='pixiv_id' placeholder='Pixiv Id')
+          input.form-control(type='text' v-model='username' placeholder='Pixiv Id')
           
           input.form-control(type='password' v-model='password' placeholder='Password')
         button.submit.btn.btn-block.btn-primary(type="submit") Sign in
@@ -16,26 +16,23 @@
     data () {
       return {
         password: '',
-        pixiv_id: ''
+        username: ''
       }
     },
     methods: {
       login ($event) {
         let btn = $($event.target).find('button[type=submit]')
         btn.button('loading')
-        this.$pixiv
-          .launch(this.pixiv_id, this.password)
-          .then(result => {
-            this.$router.push('/home')
-            btn.button('reset')
-          })
-          .catch(err => {
-            console.log(err)
-            btn.button('reset')
-          })
-      },
-      open (link) {
-        this.$electron.shell.openExternal(link)
+        this.$store.dispatch('login', {
+          password: this.password,
+          username: this.username
+        })
+        .then(result => this.$router.push('/home'))
+        .catch(err => console.log(err))
+        .then(data => {
+          btn.button('reset')
+          return data
+        })
       }
     }
   }

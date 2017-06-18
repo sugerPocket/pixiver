@@ -1,43 +1,41 @@
 <template lang='jade'>
   #main
-    button.btn.btn-primary(@click='fetch()') 抓取
-    button.btn.btn-primary(@click='download()') 下载
-    img.img-responsive(v-for='url in urls' v-bind:src='url')
+    .btn-group
+      button.btn.btn-primary(@click='fetch()') 抓取
+      button.btn.btn-success(@click='download()') 下载
+    img.img-responsive(v-for='url in displayImagesData' v-bind:src='url')
 </template>
 
 <script>
   import SystemInformation from './LandingPage/SystemInformation'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'landing-page',
     components: { SystemInformation },
-    data () {
-      return {
-        originalUrls: [],
-        urls: []
-      }
-    },
+    computed: mapState({
+      displayImagesData: state => state.pixiv.displayImagesData
+    }),
     methods: {
       download () {
-        let urls = []
-        this.originalUrls.forEach(url => {
-          if (typeof url.length !== 'undefined') url.forEach(url => urls.push(url))
-          else urls.push(url)
+        let { dialog } = this.$electron.remote
+        dialog.showOpenDialog({
+          properties: ['openDirectory', 'createDirectory']
+        },
+        paths => {
+          if (paths) {
+            this.$store.dispatch('downloadOriginalImages', paths[0] + '/')
+              .catch(err => console.log(err))
+          }
         })
-        this.$pixiv
-          .exportResources(urls.map(url => url.original || url.original_image_url))
-          .then(images => {
-            this.urls = images
-          })
-          .catch(err => console.log(err))
       },
       fetch () {
-        this.$pixiv
-          .queryUrls('byRank', new Date(2017, 6, 13), null, 0, 10)
-          .then(urls => {
-            this.originalUrls = urls
-          })
-          .catch(err => console.log(err))
+        this.$store.dispatch('query', {
+          command: 'ByRank',
+          mode: 'day',
+          from: 0,
+          to: 10
+        })
       }
     }
   }

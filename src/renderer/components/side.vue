@@ -5,7 +5,7 @@
 
 <script>
   export default {
-    name: 'login',
+    name: 'side',
     data () {
       return {
         password: '',
