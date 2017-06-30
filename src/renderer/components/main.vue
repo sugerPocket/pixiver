@@ -1,5 +1,6 @@
 <template lang='jade'>
   .main
+    modal-progress
     .wrapper
       topbar
       section.illusts-wrapper.clearfix
@@ -13,11 +14,12 @@
 <script>
   import topbar from './main/topbar'
   import side from './side'
+  import progress from './progress'
   import { mapState } from 'vuex'
 
   export default {
     name: 'main',
-    components: { topbar, side },
+    components: { topbar, side, modalProgress: progress },
     computed: mapState({
       displayImagesData: state => state.pixiv.displayImagesData
     })

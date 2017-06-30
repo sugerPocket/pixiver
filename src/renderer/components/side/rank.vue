@@ -2,20 +2,35 @@
 form(role='form')
   .form-group.input-group
     label.control-label.input-group-addon 日期
-    input.form-control(type='date')
+    input.form-control(type='text' v-model="date")
   .form-group.input-group
+    label.control-label.input-group-addon 类型
+    select.form-control(v-model="dateMode")
+      option(value='day') 每日
+      option(value='week') 每周
+      option(value='month') 每月
+  .form-group.input-group
+    label.control-label.input-group-addon 范围
+    select.form-control()
+      option(value='') 全部
+      option(value='male') 男性向
+      option(value='female') 女性向
+      option(value='original') 原创
+      option(value='rookie') 新人
+  .form-group.input-group(v-show='dateMode === "day"')
     label.control-label.input-group-addon 类型
     select.form-control()
       option(value='') 插画
       option(value='manga') 漫画
+      option(value='ugoira') 动图
   .form-group.radios
     label.col-xs-6.text-center
-      input(type="radio" name='R18' checked)
+      input(type="radio" name='R18' v-model='R18' value='' checked)
       span.radio
         span.radio-checked
       span 正常向
     label.col-xs-6.text-center
-      input(type="radio" name='R18')
+      input(type="radio" name='R18' v-model='R18' value='R18')
       span.radio
         span.radio-checked
       span R18
@@ -32,9 +47,10 @@ export default {
   data () {
     return {
       type: '',
-      date: '',
+      date: new Date(Date.now()).toLocaleDateString(),
       dateMode: '',
-      R18: false
+      R18: '',
+      mode: ''
     }
   },
   watch: {
@@ -42,7 +58,7 @@ export default {
     date: mapToConfigs
   },
   props: {
-    configs: Object
+    dispatchConfig: Function
   }
 }
 </script>

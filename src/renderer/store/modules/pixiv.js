@@ -7,7 +7,8 @@ const state = {
   queryResult: [],
   curDownImagesNum: 0,
   curDownImagesSuccessCount: 0,
-  curDownImagesFailCount: 0
+  curDownImagesFailCount: 0,
+  downloadInProgress: false
 }
 
 const UPDATE_QUERY_RESULT = 'UPDATE_QUERY_RESULT'
@@ -15,6 +16,8 @@ const UPDATE_DISPLAY_IMAGES_DATA = 'UPDATE_DISPLAY_IMAGES_DATA'
 const GET_ONE_IMAGE_SUCCESS = 'GET_ONE_IMAGE_SUCCESS'
 const GET_ONE_IMAGE_FAIL = 'GET_ONE_IMAGE_FAIL'
 const TOGGLE_ILLUST_SELECTED_STATE = 'TOGGLE_ILLUST_SELECTED_STATE'
+const START_GET_IMAGES_DATA = 'START_GET_IMAGES_DATA'
+const END_GET_IMAGES_DATA = 'END_GET_IMAGES_DATA'
 
 const mutations = {
   [UPDATE_QUERY_RESULT] (state, result) {
@@ -25,6 +28,15 @@ const mutations = {
   },
   [GET_ONE_IMAGE_SUCCESS] (state) {
     state.curDownImagesSuccessCount ++
+  },
+  [START_GET_IMAGES_DATA] (state, total) {
+    state.curDownImagesNum = total
+    state.curDownImagesFailCount = 0
+    state.curDownImagesSuccessCount = 0
+    state.downloadInProgress = true
+  },
+  [END_GET_IMAGES_DATA] (state) {
+    state.downloadInProgress = false
   },
   [GET_ONE_IMAGE_FAIL] (state) {
     state.curDownImagesFailCount ++
@@ -60,20 +72,28 @@ const actions = {
     return result.filter(data => !!data)
   },
   async downloadOriginalImages ({ commit, state }, path) {
-    let result = []
-    // TODO: get data from cache
-    result = await getImages(
-      getOriginalImageUrls(state.queryResult),
-      // TODO: progress bar
-      result => commit(GET_ONE_IMAGE_SUCCESS),
-      err => {
-        console.error(err)
-        commit(GET_ONE_IMAGE_FAIL)
-      }
-    )
+    try {
+      let result = []
+      // TODO: get data from cache
+      let urls = getOriginalImageUrls(state.queryResult)
+      commit(START_GET_IMAGES_DATA, urls.length)
+      result = await getImages(
+        urls,
+        // TODO: progress bar
+        result => commit(GET_ONE_IMAGE_SUCCESS),
+        err => {
+          console.error(err)
+          commit(GET_ONE_IMAGE_FAIL)
+        }
+      )
 
-    exportFiles(path, getFilesFromResult(result))
-    return result
+      exportFiles(path, getFilesFromResult(result))
+      return result
+    } catch (e) {
+      return {}
+    } finally {
+      commit(END_GET_IMAGES_DATA)
+    }
   }
 }
 

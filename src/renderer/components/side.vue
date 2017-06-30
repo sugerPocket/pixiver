@@ -4,7 +4,7 @@
     h1 排名
     h3 查询配置
   section
-    component(:is="mode" v-bind.sync:configs="configs") 
+    component(:is="mode" v-bind:dispatchConfigs="getConfigs") 
   footer
     button.btn.btn-block.btn-success(@click='fetch($event)' data-loading-text='正在查找...') 查找图片
     
@@ -19,7 +19,8 @@ export default {
     return {
       path: '',
       configs: {},
-      mode: 'rank'
+      mode: 'rank',
+      getConfigs () {}
     }
   },
   methods: {
