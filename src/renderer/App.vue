@@ -13,6 +13,18 @@
   }
 </script>
 
-<style>
-  /* CSS */
+<style lang='sass'>
+body
+  background-color: lighten(#2f3241, 12%)
+  color: white
+  min-height: 100vh
+  min-width: 320px
+
+.font-green
+  color: #68a692
+.bg-green
+  background-color: #68a692
+.bg-black
+  background-color: #192b3c 
+
 </style>

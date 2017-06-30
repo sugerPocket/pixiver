@@ -1,32 +1,91 @@
 <template lang='jade'>
-  .side
-    button.btn.btn-block.btn-success(@click='fetch()') 获取
+.side
+  nav
+    h1 排名
+    h3 查询配置
+  section
+    component(:is="mode" v-bind.sync:configs="configs") 
+  footer
+    button.btn.btn-block.btn-success(@click='fetch($event)' data-loading-text='正在查找...') 查找图片
+    
 </template>
 
 <script>
-  export default {
-    name: 'side',
-    methods: {
-      fetch () {
-        this.$store.dispatch('query', {
-          command: 'ByRank',
-          mode: 'day',
-          from: 0,
-          to: 10
-        })
-      }
+import rank from './side/rank'
+
+export default {
+  name: 'side',
+  data () {
+    return {
+      path: '',
+      configs: {},
+      mode: 'rank'
     }
+  },
+  methods: {
+    fetch ($event) {
+      let target = $($event.target)
+      target.button('loading')
+      this.$store.dispatch('query', {
+        command: 'ByRank',
+        mode: 'day',
+        from: 0,
+        to: 10
+      })
+      .then(() => target.button('reset'))
+    }
+  },
+  components: {
+    rank
   }
+}
 </script>
 
 <style lang='sass'>
   .side
-    top: 54px
-    right: 0
-    position: fixed
-    height: 100%
-    background-color: #2b2e3b
-    width: 410px
-    border-top: 1px solid #555
-    padding: 0 20px
+    display: flex
+    flex-direction: column
+    align-items: stretch
+    justify-content: space-between
+    margin: 5vh 0
+    height: 90vh
+    padding-right: 40px
+    @media (max-height: 720px)
+      margin: 5%
+      height: 90%
+    //background-color: #44495f//#2f3241//#2b2e3b
+    width: 335px
+
+    nav
+      padding-bottom: 10px
+      h1
+        margin-top: 0
+    section
+      flex-grow: 1
+      overflow-y: scroll
+      &::-webkit-scrollbar
+        width: 8px
+      &::-webkit-scrollbar-thumb
+        background-color: rgba(26, 13 * 16 + 13, 91, 0.9)
+        border-radius: 6px
+    footer
+      margin: 10px 0 0 0
+    button
+      background-color: #f9ad04!important
+      border: none
+      height: 42px
+      border-radius: 0
+      font-size: 18px
+      position: relative
+      &:before
+        background: rgba(15*16 + 9, 173, 4, 0.6)
+        content: ""
+        height: 100%
+        position: absolute
+        top: 5px
+        border-radius: 50px
+        z-index: -1
+        filter: blur(18px)
+        right: -5px
+        left: -5px
 </style>
