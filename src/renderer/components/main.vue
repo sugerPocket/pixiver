@@ -50,9 +50,7 @@
     margin: 5vh
     padding-bottom: 10px
     height: 90vh
-    @media (max-height: 720px)
-      margin: 5%
-      height: 90%
+    min-height: 90%
     @media (max-width: 767px)
       height: 100%
       margin: 0

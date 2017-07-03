@@ -17,7 +17,6 @@
 body
   background-color: lighten(#2f3241, 12%)
   color: white
-  min-height: 100vh
   min-width: 320px
 
 .font-green

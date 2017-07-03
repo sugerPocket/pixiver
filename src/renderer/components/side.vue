@@ -52,7 +52,6 @@ export default {
     height: 90vh
     padding-right: 40px
     @media (max-height: 720px)
-      margin: 5%
       height: 90%
     //background-color: #44495f//#2f3241//#2b2e3b
     width: 335px
@@ -64,6 +63,7 @@ export default {
     section
       flex-grow: 1
       overflow-y: scroll
+      overflow-x: hidden
       &::-webkit-scrollbar
         width: 8px
       &::-webkit-scrollbar-thumb

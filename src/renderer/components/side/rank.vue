@@ -1,8 +1,8 @@
 <template lang="jade">
-form(role='form')
+form.rank(role='form')
   .form-group.input-group
     label.control-label.input-group-addon 日期
-    input.form-control(type='text' v-model="date")
+    datepicker.picker(type='text' v-model="date")
   .form-group.input-group
     label.control-label.input-group-addon 类型
     select.form-control(v-model="dateMode")
@@ -39,6 +39,7 @@ form(role='form')
 </template>
 
 <script>
+import datepicker from 'vuejs-datepicker'
 
 const mapToConfigs = () => {}
 
@@ -59,55 +60,76 @@ export default {
   },
   props: {
     dispatchConfig: Function
-  }
+  },
+  components: { datepicker }
 }
 </script>
 
-<style lang="sass" scoped>
-.input-group-addon
-  background-color: #4dc7a0
-  color: white
-  border-color: transparent
-.form-control
-  background: rgba(0, 0, 0, 0.2)
-  border-color: transparent
-  color: white
-  outline: 0px
+<style lang="sass">
+.rank
+  .form-group
+    overflow-x: visible
+  .input-group-addon
+    background-color: #4dc7a0
+    color: white
+    border-color: transparent
+  .form-control:not(.vdp-datepicker)
+    background: rgba(0, 0, 0, 0.2)
+    border-color: transparent
+    color: white
+    outline: 0px
+  
+  .picker
+    color: black
+  .picker input
+    background: rgba(0, 0, 0, 0.2)
+    border-color: transparent
+    color: white
+    outline: 0px
+    height: 34px
+    padding: 6px 12px
+    font-size: 14px
+    width: 100%
+  .picker .vdp-datepicker__calendar
+    transform: scale(0.78)
+    transform-origin: top left
 
-option:not(:checked)
-  background-color: rgba(77, 12 * 16 + 7, 160, 0.6)
-option:checked, option:hover
-  background-color: rgb(77, 12 * 16 + 7, 160)
+  option:not(:checked)
+    background-color: rgba(77, 12 * 16 + 7, 160, 0.6)
+  option:checked, option:hover
+    background-color: rgb(77, 12 * 16 + 7, 160)
 
-.form-group.radios span
-  vertical-align: middle
-.form-group.radios > label
-  cursor: pointer
-.form-group.radios input[type='radio']
-  position: absolute
-  z-index: -1
-  margin: 0
-  opacity: 0
-  &:checked ~ span.radio > .radio-checked
-    background: rgb(77, 12 * 16 + 7, 160)
-.radio-checked
-  height: 60%
-  width: 60%
-  top: 50%
-  left: 50%
-  border-radius: 50%
-  transform: translate(-50%, -50%)
-  position: absolute
-  display: inline-block
-  vertical-align: middle
-.form-group.radios span.radio
-  display: inline-block
-  border-radius: 50%
-  position: relative
-  height: 24px
-  width: 24px
-  margin: 0 10px 0 0
-  vertical-align: middle
-  background-color: rgba(0, 0, 0, 0.2)
+  .form-group.radios span
+    vertical-align: middle
+  .form-group.radios > label
+    cursor: pointer
+  .form-group.radios input[type='radio']
+    position: absolute
+    z-index: -1
+    margin: 0
+    opacity: 0
+    &:checked ~ span.radio > .radio-checked
+      background: rgb(77, 12 * 16 + 7, 160)
+  .radio-checked
+    height: 60%
+    width: 60%
+    top: 50%
+    left: 50%
+    border-radius: 50%
+    transform: translate(-50%, -50%)
+    position: absolute
+    display: inline-block
+    vertical-align: middle
+  .form-group.radios span.radio
+    display: inline-block
+    border-radius: 50%
+    position: relative
+    height: 24px
+    width: 24px
+    margin: 0 10px 0 0
+    vertical-align: middle
+    background-color: rgba(0, 0, 0, 0.2)
+
+
 
 </style>
