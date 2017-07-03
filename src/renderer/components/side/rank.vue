@@ -2,7 +2,9 @@
 form.rank(role='form')
   .form-group.input-group
     label.control-label.input-group-addon 日期
-    datepicker.picker(type='text' v-model="date")
+    datepicker.picker(type='text' v-model="date" language='zh' 
+			data-placement="top" 
+			data-content="选择的日期不能大于今日")
   .form-group.input-group
     label.control-label.input-group-addon 类型
     select.form-control(v-model="dateMode")
@@ -41,7 +43,7 @@ form.rank(role='form')
 <script>
 import datepicker from 'vuejs-datepicker'
 
-const mapToConfigs = () => {}
+// const mapToConfigs = () => {}
 
 export default {
   name: 'rankConfig',
@@ -49,14 +51,18 @@ export default {
     return {
       type: '',
       date: new Date(Date.now()).toLocaleDateString(),
-      dateMode: '',
+      dateMode: 'day',
       R18: '',
       mode: ''
     }
   },
   watch: {
-    type: mapToConfigs,
-    date: mapToConfigs
+    date (date) {
+      if (date > Date.now()) {
+        $(this.$el).find('.picker').popover()
+        this.date = new Date(Date.now())
+      }
+    }
   },
   props: {
     dispatchConfig: Function
@@ -93,6 +99,14 @@ export default {
   .picker .vdp-datepicker__calendar
     transform: scale(0.78)
     transform-origin: top left
+  .picker .vdp-datepicker__calendar .cell
+    &.selected
+      background: #4dc7a0
+      color: white
+    &:not(.blank):not(.disabled)
+      &.day, &.month, &.month
+        &:hover
+          border: 1px solid #4dc7a0
 
   option:not(:checked)
     background-color: rgba(77, 12 * 16 + 7, 160, 0.6)
