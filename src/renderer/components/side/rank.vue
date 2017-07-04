@@ -1,9 +1,9 @@
 <template lang="jade">
-form.rank(role='form')
+form.rank(role='form' v-on:queryBegin.stop="dispatch($data)")
   .form-group.input-group
     label.control-label.input-group-addon 日期
     datepicker.picker(type='text' v-model="date" language='zh' 
-			data-placement="top" 
+			data-placement="top" data-toggle="popover" data-container="body"
 			data-content="选择的日期不能大于今日")
   .form-group.input-group
     label.control-label.input-group-addon 类型
@@ -13,7 +13,7 @@ form.rank(role='form')
       option(value='month') 每月
   .form-group.input-group
     label.control-label.input-group-addon 范围
-    select.form-control()
+    select.form-control(v-model="mode")
       option(value='') 全部
       option(value='male') 男性向
       option(value='female') 女性向
@@ -21,7 +21,7 @@ form.rank(role='form')
       option(value='rookie') 新人
   .form-group.input-group(v-show='dateMode === "day"')
     label.control-label.input-group-addon 类型
-    select.form-control()
+    select.form-control(v-model="type")
       option(value='') 插画
       option(value='manga') 漫画
       option(value='ugoira') 动图
@@ -42,7 +42,6 @@ form.rank(role='form')
 
 <script>
 import datepicker from 'vuejs-datepicker'
-
 // const mapToConfigs = () => {}
 
 export default {
@@ -50,22 +49,35 @@ export default {
   data () {
     return {
       type: '',
-      date: new Date(Date.now()).toLocaleDateString(),
+      date: new Date(Date.now()),
       dateMode: 'day',
       R18: '',
-      mode: ''
+      mode: '',
+      from: 0,
+      to: 0
+    }
+  },
+  computed: {
+    configs () {
+      let conf = {}
+      conf.mode = this.dateMode
+      conf.mode += this.mode ? '_' + this.mode : ''
+      conf.mode += this.type ? '_' + this.type : ''
+      conf.mode += this.R18 ? '_R18' : ''
+
+      let { from, to } = this
+      return { ...conf, from: from , to }
     }
   },
   watch: {
     date (date) {
-      if (date > Date.now()) {
-        $(this.$el).find('.picker').popover()
-        this.date = new Date(Date.now())
-      }
+      let warning = command => $(this.$el).find('.picker').popover(command)
+      if (date.valueOf() > Date.now()) warning('show')
+      else warning('hide')
     }
   },
   props: {
-    dispatchConfig: Function
+    dispatch: Function
   },
   components: { datepicker }
 }

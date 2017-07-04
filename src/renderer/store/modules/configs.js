@@ -1,19 +1,21 @@
-const state = {
-
-}
+const state = {}
 
 const mutations = {
 
 }
 
-const actions = {
-  getQueryConfigs ({ state }, mode) {
-    return state[mode] || {}
+const getters = {
+  ranking () {
+    return {}
   }
+}
+
+const actions = {
 }
 
 export default {
   state,
   mutations,
+  getters,
   actions
 }

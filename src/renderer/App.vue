@@ -18,6 +18,8 @@ body
   background-color: lighten(#2f3241, 12%)
   color: white
   min-width: 320px
+.popover
+  color: #292b2c
 
 .font-green
   color: #68a692

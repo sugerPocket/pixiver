@@ -20,9 +20,9 @@
   export default {
     name: 'main',
     components: { topbar, side, modalProgress: progress },
-    computed: mapState({
-      displayImagesData: state => state.pixiv.displayImagesData
-    })
+    computed: mapState('pixiv', [
+      'displayImagesData'
+    ])
   }
 </script>
 

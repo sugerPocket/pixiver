@@ -4,7 +4,7 @@
     h1 排名
     h3 查询配置
   section
-    component(:is="mode" v-bind:dispatchConfigs="getConfigs") 
+    component(:is="mode" @queryBegin='' v-bind:dispatch="fetch") 
   footer
     button.btn.btn-block.btn-success(@click='fetch($event)' data-loading-text='正在查找...') 查找图片
     
@@ -24,6 +24,7 @@ export default {
     }
   },
   methods: {
+
     fetch ($event) {
       let target = $($event.target)
       target.button('loading')
