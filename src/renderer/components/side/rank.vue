@@ -1,19 +1,18 @@
 <template lang="jade">
 form.rank(role='form' v-on:queryBegin.stop="dispatch($data)")
   .form-group.input-group
-    label.control-label.input-group-addon 日期
-    datepicker.picker(type='text' v-model="date" language='zh' 
-			data-placement="top" data-toggle="popover" data-container="body"
-			data-content="选择的日期不能大于今日")
+    label.control-label.input-group-addon.picker-popover(data-placement="top" data-toggle="popover" name='date' data-container="body"
+			data-content="选择的日期不能大于今日") 日期
+    datepicker.picker(type='text' v-model="date" @input='updateDate' language='zh')
   .form-group.input-group
     label.control-label.input-group-addon 类型
-    select.form-control(v-model="dateMode")
+    select.form-control(v-model="dateMode" name='dateMode' @input='update')
       option(value='day') 每日
       option(value='week') 每周
       option(value='month') 每月
   .form-group.input-group
     label.control-label.input-group-addon 范围
-    select.form-control(v-model="mode")
+    select.form-control(v-model="mode" name='mode' @input='update')
       option(value='') 全部
       option(value='male') 男性向
       option(value='female') 女性向
@@ -21,18 +20,18 @@ form.rank(role='form' v-on:queryBegin.stop="dispatch($data)")
       option(value='rookie') 新人
   .form-group.input-group(v-show='dateMode === "day"')
     label.control-label.input-group-addon 类型
-    select.form-control(v-model="type")
+    select.form-control(v-model="type" name='type' @input='update')
       option(value='') 插画
       option(value='manga') 漫画
       option(value='ugoira') 动图
   .form-group.radios
     label.col-xs-6.text-center
-      input(type="radio" name='R18' v-model='R18' value='' checked)
+      input(type="radio" name='R18' v-model='R18' value='' @input='update' checked)
       span.radio
         span.radio-checked
       span 正常向
     label.col-xs-6.text-center
-      input(type="radio" name='R18' v-model='R18' value='R18')
+      input(type="radio" name='R18' v-model='R18' value='R18' @input='update')
       span.radio
         span.radio-checked
       span R18
@@ -42,38 +41,34 @@ form.rank(role='form' v-on:queryBegin.stop="dispatch($data)")
 
 <script>
 import datepicker from 'vuejs-datepicker'
-// const mapToConfigs = () => {}
+import { mapState } from 'vuex'
 
 export default {
   name: 'rankConfig',
-  data () {
-    return {
-      type: '',
-      date: new Date(Date.now()),
-      dateMode: 'day',
-      R18: '',
-      mode: '',
-      from: 0,
-      to: 0
-    }
-  },
   computed: {
-    configs () {
-      let conf = {}
-      conf.mode = this.dateMode
-      conf.mode += this.mode ? '_' + this.mode : ''
-      conf.mode += this.type ? '_' + this.type : ''
-      conf.mode += this.R18 ? '_R18' : ''
-
-      let { from, to } = this
-      return { ...conf, from: from , to }
-    }
+    ...mapState('configs/ranking', {
+      R18: 'R18',
+      date: 'date',
+      dateMode: 'dateMode',
+      mode: 'mode',
+      type: 'type',
+      from: 'from',
+      to: 'to'
+    })
   },
-  watch: {
-    date (date) {
-      let warning = command => $(this.$el).find('.picker').popover(command)
+  methods: {
+    updateDate (date) {
+      let warning = command => $(this.$el).find('.picker-popover').popover(command)
       if (date.valueOf() > Date.now()) warning('show')
-      else warning('hide')
+      else {
+        this.$store.commit('configs/ranking/UPDATE', { date })
+        warning('hide')
+      }
+    },
+    update ($event) {
+      let { name } = $event.target
+      let { value } = $event.target
+      this.$store.commit('configs/ranking/UPDATE', { [name]: value })
     }
   },
   props: {

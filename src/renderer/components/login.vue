@@ -12,31 +12,31 @@
 </template>
 
 <script>
-  export default {
-    name: 'login',
-    data () {
-      return {
-        password: '',
-        username: ''
-      }
-    },
-    methods: {
-      login ($event) {
-        let btn = $($event.target).find('button[type=submit]')
-        btn.button('loading')
-        this.$store.dispatch('login', {
-          password: this.password,
-          username: this.username
-        })
-        .then(result => this.$router.push('/home'))
-        .catch(err => console.log(err))
-        .then(data => {
-          btn.button('reset')
-          return data
-        })
-      }
+export default {
+  name: 'login',
+  data () {
+    return {
+      password: '',
+      username: ''
+    }
+  },
+  methods: {
+    login ($event) {
+      let btn = $($event.target).find('button[type=submit]')
+      btn.button('loading')
+      this.$store.dispatch('user/login', {
+        password: this.password,
+        username: this.username
+      })
+      .then(result => this.$router.push('/home'))
+      .catch(err => console.log(err))
+      .then(data => {
+        btn.button('reset')
+        return data
+      })
     }
   }
+}
 </script>
 
 <style lang='sass' scoped>
