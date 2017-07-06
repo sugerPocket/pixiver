@@ -8,7 +8,7 @@
           input.form-control(type='text' v-model='username' placeholder='Pixiv Id')
         .form-group
           input.form-control(type='password' v-model='password' placeholder='Password')
-        button.submit.btn.btn-block.btn-primary(type="submit") Log In
+        button#login.submit.btn.btn-block.btn-primary(type="submit") Log In
 </template>
 
 <script>
@@ -24,16 +24,21 @@ export default {
     login ($event) {
       let btn = $($event.target).find('button[type=submit]')
       btn.button('loading')
-      this.$store.dispatch('user/login', {
+      let data = {
         password: this.password,
         username: this.username
-      })
-      .then(result => this.$router.push('/home'))
-      .catch(err => console.log(err))
-      .then(data => {
-        btn.button('reset')
-        return data
-      })
+      }
+      this.$store
+        .dispatch('user/login', data)
+        .then(result => {
+          this.$router.push('/home')
+          localStorage.setItem('$pixiver', JSON.stringify(Object.assign({}, result, data)))
+        })
+        .catch(err => console.log(err))
+        .then(data => {
+          btn.button('reset')
+          return data
+        })
     }
   }
 }

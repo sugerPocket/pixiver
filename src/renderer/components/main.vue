@@ -4,6 +4,7 @@
     .wrapper
       topbar
       section.illusts-wrapper.clearfix
+        button.btn.btn-success(@click='test') test
         .none-img(v-show="!displayImagesData.length")
           h1 There are no image
         .illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4(v-for='url in displayImagesData')
@@ -22,7 +23,14 @@
     components: { topbar, side, modalProgress: progress },
     computed: mapState('pixiv', [
       'displayImagesData'
-    ])
+    ]),
+    methods: {
+      test () {
+        let accessToken = this.$store.getters['user/accessToken']
+        this.$store
+          .dispatch('pixiv/query', { command: 'ByID', accessToken })
+      }
+    }
   }
 </script>
 
@@ -32,7 +40,7 @@
   .main
     display: flex
     height: 100vh
-    min-height: 720px
+    min-height: 563px
     justify-content: space-between
   .illust-item
     margin-bottom: 50px
@@ -54,19 +62,20 @@
     @media (max-width: 767px)
       height: 100%
       margin: 0
+    @media (min-width: 767px)
+      &:before, &:after
+        background: rgba(43, 54, 82, 0.3)
+        content: ""
+        height: 100%
+        position: absolute
+        top: 5px
+        border-radius: 50px
+        z-index: -1
+        filter: blur(14px)
+        left: -5px
+        right: -5px
     border-radius: 2px
     position: relative
-    &:before, &:after
-      background: rgba(43, 54, 82, 0.3)
-      content: ""
-      height: 100%
-      position: absolute
-      top: 5px
-      border-radius: 50px
-      z-index: -1
-      filter: blur(14px)
-      left: -5px
-      right: -5px
   .side
     flex-grow: 0
     flex: 0 0 335px

@@ -1,74 +1,100 @@
 <template lang="jade">
-form.rank(role='form' v-on:queryBegin.stop="dispatch($data)")
+form.rank(role='form')
   .form-group.input-group
-    label.control-label.input-group-addon.picker-popover(data-placement="top" data-toggle="popover" name='date' data-container="body"
+    label.control-label.input-group-addon.date-warning(data-placement="top" data-toggle="popover" name='date' data-container="body"
 			data-content="选择的日期不能大于今日") 日期
-    datepicker.picker(type='text' v-model="date" @input='updateDate' language='zh')
+    datepicker.picker(type='text' v-model="configs.date" language='zh')
   .form-group.input-group
     label.control-label.input-group-addon 类型
-    select.form-control(v-model="dateMode" name='dateMode' @input='update')
+    select.form-control(v-model="configs.dateMode")
       option(value='day') 每日
       option(value='week') 每周
       option(value='month') 每月
   .form-group.input-group
     label.control-label.input-group-addon 范围
-    select.form-control(v-model="mode" name='mode' @input='update')
+    select.form-control(v-model="configs.mode")
       option(value='') 全部
       option(value='male') 男性向
       option(value='female') 女性向
       option(value='original') 原创
       option(value='rookie') 新人
-  .form-group.input-group(v-show='dateMode === "day"')
+  .form-group.input-group(v-show='configs.dateMode === "day"')
     label.control-label.input-group-addon 类型
-    select.form-control(v-model="type" name='type' @input='update')
+    select.form-control(v-model="configs.type")
       option(value='') 插画
       option(value='manga') 漫画
       option(value='ugoira') 动图
-  .form-group.radios
+  .form-group.input-group
+    label.control-label.input-group-addon from
+    input.form-control(v-model.lazy.number='configs.from' type='number' min='0')
+    .limit-warning(style='display: none' data-placement="top" data-toggle="popover" data-container="body"
+			data-content="排名上限必须大于下限")
+    label.control-label.input-group-addon(style='background-color: transparent') ~
+    label.control-label.input-group-addon &nbsp;&nbsp;to&nbsp;&nbsp;
+    input.form-control(v-model.lazy.number="configs.to" type="number" v-bind:min='configs.from')
+  .form-group.radios.clearfix
     label.col-xs-6.text-center
-      input(type="radio" name='R18' v-model='R18' value='' @input='update' checked)
+      input(type="radio" v-model='configs.R18' value='' checked)
       span.radio
         span.radio-checked
       span 正常向
     label.col-xs-6.text-center
-      input(type="radio" name='R18' v-model='R18' value='R18' @input='update')
+      input(type="radio" v-model='configs.R18' value='R18')
       span.radio
         span.radio-checked
       span R18
-  
-  
 </template>
 
 <script>
 import datepicker from 'vuejs-datepicker'
-import { mapState } from 'vuex'
 
 export default {
   name: 'rankConfig',
-  computed: {
-    ...mapState('configs/ranking', {
-      R18: 'R18',
-      date: 'date',
-      dateMode: 'dateMode',
-      mode: 'mode',
-      type: 'type',
-      from: 'from',
-      to: 'to'
-    })
+  data () {
+    return {
+      configs: {
+        R18: '',
+        date: new Date(Date.now()),
+        dateMode: 'day',
+        mode: '',
+        type: '',
+        from: 0,
+        to: 0
+      }
+    }
   },
   methods: {
-    updateDate (date) {
-      let warning = command => $(this.$el).find('.picker-popover').popover(command)
-      if (date.valueOf() > Date.now()) warning('show')
-      else {
-        this.$store.commit('configs/ranking/UPDATE', { date })
-        warning('hide')
-      }
+    warning (selector, command) {
+      $(this.$el)
+        .find(selector)
+        .popover(command)
     },
-    update ($event) {
-      let { name } = $event.target
-      let { value } = $event.target
-      this.$store.commit('configs/ranking/UPDATE', { [name]: value })
+    validation (configs, oldConfigs) {
+      let { from, to, date } = this.configs
+
+      configs = Object.assign({}, configs)
+
+      if (date > Date.now()) {
+        this.warning('.date-warning', 'show')
+        configs = Object.assign({}, oldConfigs)
+      } else this.warning('.date-warning', 'hide')
+
+      if (from > to) {
+        this.warning('.limit-warning', 'show')
+        this.configs.to = from
+        configs = null
+      } else this.warning('.limit-warning', 'hide')
+
+      return configs
+    }
+  },
+  watch: {
+    configs: {
+      handler (value, old) {
+        value = this.validation(value, old)
+        if (value) this.$store.commit('configs/ranking/UPDATE', value)
+      },
+      deep: true
     }
   },
   props: {
@@ -150,7 +176,4 @@ export default {
     margin: 0 10px 0 0
     vertical-align: middle
     background-color: rgba(0, 0, 0, 0.2)
-
-
-
 </style>

@@ -18,16 +18,26 @@ const mutations = {
   }
 }
 
+const getters = {
+  accessToken (state) {
+    return state.access_token
+  }
+}
+
 const actions = {
   login ({ commit }, data) {
     let { username, password } = data
     return login(username, password)
-      .then(result => commit(AUTH_SUCCESS, Object.assign({ username, password }, result.body)))
+      .then(result => {
+        commit(AUTH_SUCCESS, Object.assign({ username, password }, result.body.response))
+        return result.body.response
+      })
   }
 }
 
 export default {
   state,
   mutations,
+  getters,
   actions
 }

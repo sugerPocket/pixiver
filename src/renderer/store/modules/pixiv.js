@@ -59,7 +59,6 @@ const actions = {
   },
   async getDisplayImagesData ({ commit, state }) {
     let result = []
-    // TODO: get data from cache
     result = await Promise.all(getDisplayImageUrls(state.queryResult)
       .map(url => {
         return getSingleImage(url)
@@ -74,12 +73,10 @@ const actions = {
   async downloadOriginalImages ({ commit, state }, path) {
     try {
       let result = []
-      // TODO: get data from cache
       let urls = getOriginalImageUrls(state.queryResult)
       commit(START_GET_IMAGES_DATA, urls.length)
       result = await getImages(
         urls,
-        // TODO: progress bar
         result => commit(GET_ONE_IMAGE_SUCCESS),
         err => {
           console.error(err)

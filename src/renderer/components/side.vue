@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import rank from './side/rank'
+import ranking from './side/ranking'
 
 export default {
   name: 'side',
@@ -19,26 +19,24 @@ export default {
     return {
       path: '',
       configs: {},
-      mode: 'rank',
+      mode: 'ranking',
       getConfigs () {}
     }
   },
   methods: {
 
     fetch ($event) {
+      let configs = this.$store.getters[`configs/${this.mode}/query`]
       let target = $($event.target)
       target.button('loading')
-      this.$store.dispatch('query', {
-        command: 'ByRank',
-        mode: 'day',
-        from: 0,
-        to: 10
-      })
-      .then(() => target.button('reset'))
+      this
+        .$store
+        .dispatch('pixiv/query', configs)
+        .then(() => target.button('reset'))
     }
   },
   components: {
-    rank
+    ranking
   }
 }
 </script>

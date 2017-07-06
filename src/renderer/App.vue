@@ -9,7 +9,18 @@
   import 'bootstrap/dist/css/bootstrap.min.css'
 
   export default {
-    name: 'pixiver'
+    name: 'pixiver',
+    async mounted () {
+      let user = localStorage.getItem('$pixiver')
+      try {
+        if (user) {
+          user = JSON.parse(user)
+          await this.$store.dispatch('user/login', user)
+        } else throw (new Error())
+      } catch (e) {
+        this.$router.replace('/login')
+      }
+    }
   }
 </script>
 

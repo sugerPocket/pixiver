@@ -16,7 +16,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name: 'landing-page',
+      name: 'main',
       component: require('@/components/main')
     },
     {
