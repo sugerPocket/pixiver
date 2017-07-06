@@ -28,7 +28,7 @@
       test () {
         let accessToken = this.$store.getters['user/accessToken']
         this.$store
-          .dispatch('pixiv/query', { command: 'ByID', accessToken })
+          .dispatch('pixiv/query', { command: 'ByID', illustId: 63693585, accessToken })
       }
     }
   }

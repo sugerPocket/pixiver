@@ -1,7 +1,7 @@
 const state = {
-  type: '',
+  type: 'all',
   date: new Date(Date.now()),
-  dateMode: 'day',
+  dateMode: 'daily',
   R18: '',
   mode: '',
   from: 0,
@@ -21,6 +21,7 @@ const getters = {
       date: state.date,
       from: state.from,
       to: state.to,
+      type: state.type,
       mode
     }
   }

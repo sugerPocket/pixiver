@@ -97,5 +97,8 @@ export function exportFiles (path, files, onItemSuccess, onItemFailed) {
  * @return {String} 参数字符串 YYYY-MM-DD
  */
 export function transformDate (date) {
-  return date ? `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}` : null
+  let year = date.getFullYear()
+  let month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1)
+  let day = (date.getDate() < 10 ? '0' : '') + date.getDate()
+  return date ? `${year}-${month}-${day}` : null
 }

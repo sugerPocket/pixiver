@@ -7,9 +7,9 @@ form.rank(role='form')
   .form-group.input-group
     label.control-label.input-group-addon 类型
     select.form-control(v-model="configs.dateMode")
-      option(value='day') 每日
-      option(value='week') 每周
-      option(value='month') 每月
+      option(value='daily') 每日
+      option(value='weekly') 每周
+      option(value='monthly') 每月
   .form-group.input-group
     label.control-label.input-group-addon 范围
     select.form-control(v-model="configs.mode")
@@ -21,7 +21,8 @@ form.rank(role='form')
   .form-group.input-group(v-show='configs.dateMode === "day"')
     label.control-label.input-group-addon 类型
     select.form-control(v-model="configs.type")
-      option(value='') 插画
+      option(value='all') 综合
+      option(value='illust') 插画
       option(value='manga') 漫画
       option(value='ugoira') 动图
   .form-group.input-group
@@ -55,9 +56,9 @@ export default {
       configs: {
         R18: '',
         date: new Date(Date.now()),
-        dateMode: 'day',
+        dateMode: 'daily',
         mode: '',
-        type: '',
+        type: 'all',
         from: 0,
         to: 0
       }

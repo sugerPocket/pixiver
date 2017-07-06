@@ -27,11 +27,12 @@ export default {
 
     fetch ($event) {
       let configs = this.$store.getters[`configs/${this.mode}/query`]
+      let accessToken = this.$store.getters['user/accessToken']
       let target = $($event.target)
       target.button('loading')
       this
         .$store
-        .dispatch('pixiv/query', configs)
+        .dispatch('pixiv/query', { ...configs, accessToken })
         .then(() => target.button('reset'))
     }
   },
