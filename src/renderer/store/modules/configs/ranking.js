@@ -1,9 +1,10 @@
+import { lessThanToday } from '../../../utils'
+
 const state = {
   type: 'all',
   date: new Date(Date.now()),
-  dateMode: 'daily',
   R18: '',
-  mode: '',
+  mode: 'daily',
   from: 0,
   to: 0
 }
@@ -12,13 +13,12 @@ const getters = {
   query (state) {
     let mode = ''
 
-    mode += state.dateMode
-    mode += ((mode && state.mode ? '_' : '') + state.mode)
+    mode += state.mode
     mode += (mode && state.R18) ? '_r18' : ''
 
     return {
       command: 'ByRank',
-      date: state.date,
+      date: lessThanToday(state.date) ? state.date : null,
       from: state.from,
       to: state.to,
       type: state.type,

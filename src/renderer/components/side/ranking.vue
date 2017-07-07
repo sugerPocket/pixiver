@@ -4,7 +4,7 @@ form.rank(role='form')
     label.control-label.input-group-addon.date-warning(data-placement="top" data-toggle="popover" name='date' data-container="body"
 			data-content="选择的日期不能大于今日") 日期
     datepicker.picker(type='text' v-model="configs.date" language='zh')
-  .form-group.input-group
+  //.form-group.input-group
     label.control-label.input-group-addon 类型
     select.form-control(v-model="configs.dateMode")
       option(value='daily') 每日
@@ -13,12 +13,14 @@ form.rank(role='form')
   .form-group.input-group
     label.control-label.input-group-addon 范围
     select.form-control(v-model="configs.mode")
-      option(value='') 全部
+      option(value='daily') 每日
+      option(value='weekly') 每周
+      option(value='monthly') 每月
       option(value='male') 男性向
       option(value='female') 女性向
       option(value='original') 原创
       option(value='rookie') 新人
-  .form-group.input-group(v-show='configs.dateMode === "day"')
+  .form-group.input-group
     label.control-label.input-group-addon 类型
     select.form-control(v-model="configs.type")
       option(value='all') 综合
@@ -56,8 +58,7 @@ export default {
       configs: {
         R18: '',
         date: new Date(Date.now()),
-        dateMode: 'daily',
-        mode: '',
+        mode: 'daily',
         type: 'all',
         from: 0,
         to: 0

@@ -59,15 +59,23 @@ const actions = {
   },
   async getDisplayImagesData ({ commit, state }) {
     let result = []
-    result = await Promise.all(getDisplayImageUrls(state.queryResult)
-      .map(url => {
-        return getSingleImage(url)
-          .then(result => URL.createObjectURL(new Blob([result.body], { type: result.type })))
-          .catch(err => console.log(err))
-      })
+    result = await Promise.all(
+      state
+        .queryResult
+        .map(async imageObj => {
+          try {
+            let displayImgData = await getSingleImage(imageObj.work.image_urls.px_480mw)
+            imageObj.work.displayImageDataUrl = URL.createObjectURL(new Blob([displayImgData.body], { type: displayImgData.type }))
+            let profileImgData = await getSingleImage(imageObj.work.user.profile_image_urls.px_50x50)
+            imageObj.work.user.proflieImageDataUrl = URL.createObjectURL(new Blob([profileImgData.body], { type: profileImgData.type }))
+          } catch (e) {
+            console.log(e)
+          }
+          return imageObj
+        })
     )
 
-    commit(UPDATE_DISPLAY_IMAGES_DATA, result)
+    commit(UPDATE_QUERY_RESULT, result)
     return result.filter(data => !!data)
   },
   async downloadOriginalImages ({ commit, state }, path) {
@@ -100,9 +108,9 @@ const actions = {
  * @param {Array<object>} queryResult api 查询结果
  * @return {Array<String | String[]>}
  */
-function getDisplayImageUrls (queryResult) {
-  return queryResult.map(imageObj => imageObj.image_urls.square_medium)
-}
+// function getDisplayImageUrls (queryResult) {
+//   return queryResult.map(imageObj => imageObj.work.image_urls.medium)
+// }
 
 /**
  * 获取 选择图片的 original url(s)

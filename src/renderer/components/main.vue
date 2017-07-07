@@ -3,12 +3,18 @@
     modal-progress
     .wrapper
       topbar
-      section.illusts-wrapper.clearfix
-        button.btn.btn-success(@click='test') test
-        .none-img(v-show="!displayImagesData.length")
+      section.illusts-wrapper.row.clearfix
+        // button.btn.btn-success(@click='test') test
+        .none-img(v-show="!queryResult.length")
           h1 There are no image
-        .illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4(v-for='url in displayImagesData')
-          img.img-responsive(v-bind:src='url')
+        section.illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4.text-center(v-for='result in queryResult')
+          .illust-container
+            img.img-responsive.work(v-bind:src='result.work.displayImageDataUrl' v-bind:title='\'illust id: \' + result.work.id')
+            header.illust-title
+              h5 {{ result.work.title }}
+            .user-meta(:title='\'pixiv id: \' + result.work.user.id')
+              img.profile(v-bind:src='result.work.user.proflieImageDataUrl')
+              span.name {{ result.work.user.name }}
     side.hidden-xs.side
 </template>
 
@@ -22,13 +28,17 @@
     name: 'main',
     components: { topbar, side, modalProgress: progress },
     computed: mapState('pixiv', [
-      'displayImagesData'
+      'queryResult'
     ]),
     methods: {
       test () {
         let accessToken = this.$store.getters['user/accessToken']
         this.$store
-          .dispatch('pixiv/query', { command: 'ByID', illustId: 63693585, accessToken })
+          .dispatch('pixiv/query', {
+            command: 'ByID',
+            illustId: 63709413,
+            accessToken
+          })
       }
     }
   }
@@ -43,12 +53,39 @@
     min-height: 563px
     justify-content: space-between
   .illust-item
+    display: inline-block
+    vertical-align: top
+    float: none
     margin-bottom: 50px
-    //background-color: #4dc7a0
     border-radius: 3px
-    img
-      width: 90%
-      margin: 0 5%
+  .illust-title
+    & > h5
+      white-space: nowrap
+      text-overflow : ellipsis
+      overflow: hidden
+  .illust-container
+    display: inline-block
+    border-radius: 1%
+    padding: 2%
+    width: 90%
+    background-color: rgb(77, 12 * 16 + 7, 160)
+  img.work
+    display: inline-block
+  .user-meta
+    display: inline-block
+    margin-bottom: 5px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow : ellipsis
+    max-width: 100%
+    img.profile
+      border-radius: 10%
+      width: 35px
+      height: 35px
+      displsy: inline-block
+    .name
+      max-width: 100%
+      padding-left: 10px
   .wrapper
     display: flex
     flex-direction: column

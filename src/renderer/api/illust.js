@@ -13,11 +13,11 @@ async function byRank ({ date, mode, from, to, type, accessToken }) {
     include_sanity_level: true,
     profile_image_sizes: 'px_50x50',
     include_stats: true,
-    image_sizes: 'medium,large'
+    image_sizes: 'small,px_480mw,medium,large'
   }
   if (date) query.date = date
 
-  await request
+  return request
     .get(`https://public-api.secure.pixiv.net/v1/ranking/${type}`)
     .set('Authorization', `Bearer ${accessToken}`)
     .set('Referer', 'http://spapi.pixiv-app.net/')
@@ -25,16 +25,12 @@ async function byRank ({ date, mode, from, to, type, accessToken }) {
     .query(query)
     .then(result => {
       console.log(result)
+      return result.body.response[0].works.slice(from)
     })
     .catch(response => {
       console.log(response)
+      return []
     })
-
-  return []
-  // result
-  //   .body
-  //   .response
-  //   .slice(from)
 }
 
 async function byAuthor () {
