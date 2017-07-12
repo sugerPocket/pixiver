@@ -1,3 +1,4 @@
+import { setAccessToken } from '../../api'
 import { login } from '../../api/auth'
 
 const state = {
@@ -11,6 +12,7 @@ const AUTH_SUCCESS = 'AUTH_SUCCESS'
 
 const mutations = {
   [AUTH_SUCCESS] (state, result) {
+    setAccessToken(result.access_token)
     state.username = result.username
     state.password = result.password
     state.access_token = result.access_token

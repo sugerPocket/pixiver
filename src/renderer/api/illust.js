@@ -1,5 +1,6 @@
 import request from 'superagent'
 import { transformDate } from '../utils'
+import { PixivRequest } from './index'
 
 const PREFIX = 'get'
 
@@ -17,12 +18,8 @@ async function byRank ({ date, mode, from, to, type, accessToken }) {
   }
   if (date) query.date = date
 
-  return request
-    .get(`https://public-api.secure.pixiv.net/v1/ranking/${type}`)
-    .set('Authorization', `Bearer ${accessToken}`)
-    .set('Referer', 'http://spapi.pixiv-app.net/')
-    .set('Host', 'public-api.secure.pixiv.net')
-    .query(query)
+  return PixivRequest
+    .get(`ranking/${type}`, query)
     .then(result => {
       console.log(result)
       return result.body.response[0].works.slice(from)

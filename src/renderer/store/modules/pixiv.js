@@ -68,9 +68,7 @@ const actions = {
             imageObj.work.displayImageDataUrl = URL.createObjectURL(new Blob([displayImgData.body], { type: displayImgData.type }))
             let profileImgData = await getSingleImage(imageObj.work.user.profile_image_urls.px_50x50)
             imageObj.work.user.proflieImageDataUrl = URL.createObjectURL(new Blob([profileImgData.body], { type: profileImgData.type }))
-          } catch (e) {
-            console.log(e)
-          }
+          } catch (e) {}
           return imageObj
         })
     )
