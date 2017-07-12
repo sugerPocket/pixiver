@@ -8,7 +8,8 @@ const state = {
   curDownImagesNum: 0,
   curDownImagesSuccessCount: 0,
   curDownImagesFailCount: 0,
-  downloadInProgress: false
+  downloadInProgress: false,
+  queryInProgress: false
 }
 
 const UPDATE_QUERY_RESULT = 'UPDATE_QUERY_RESULT'
@@ -18,6 +19,7 @@ const GET_ONE_IMAGE_FAIL = 'GET_ONE_IMAGE_FAIL'
 const TOGGLE_ILLUST_SELECTED_STATE = 'TOGGLE_ILLUST_SELECTED_STATE'
 const START_GET_IMAGES_DATA = 'START_GET_IMAGES_DATA'
 const END_GET_IMAGES_DATA = 'END_GET_IMAGES_DATA'
+const TOGGLE_QUERY_STATE = 'TOGGLE_QUERY_STATE'
 
 const mutations = {
   [UPDATE_QUERY_RESULT] (state, result) {
@@ -43,6 +45,9 @@ const mutations = {
   },
   [TOGGLE_ILLUST_SELECTED_STATE] (state, index) {
     state.queryResult[index].selected = !state.queryResult[index].selected
+  },
+  [TOGGLE_QUERY_STATE] (state, inProgress) {
+    state.queryInProgress = inProgress
   }
 }
 
@@ -59,6 +64,7 @@ const actions = {
   },
   async getDisplayImagesData ({ commit, state }) {
     let result = []
+    commit(TOGGLE_QUERY_STATE, true)
     result = await Promise.all(
       state
         .queryResult
@@ -73,6 +79,7 @@ const actions = {
         })
     )
 
+    commit(TOGGLE_QUERY_STATE, false)
     commit(UPDATE_QUERY_RESULT, result)
     return result.filter(data => !!data)
   },

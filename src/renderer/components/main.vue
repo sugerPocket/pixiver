@@ -4,12 +4,26 @@
     .wrapper
       topbar
       section.illusts-wrapper.row.clearfix
-        // button.btn.btn-success(@click='test') test
         .none-img(v-show="!queryResult.length")
           h1 There are no image
         section.illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4.text-center(v-for='result in queryResult')
           .illust-container
-            img.img-responsive.work(v-bind:src='result.work.displayImageDataUrl' v-bind:title='\'illust id: \' + result.work.id')
+            img.img-responsive.work(v-show='result.work.displayImageDataUrl' v-bind:src='result.work.displayImageDataUrl' v-bind:title='\'illust id: \' + result.work.id')
+            .load-failed(
+              :style='calTopPadding(result.work.height, result.work.width)'
+              v-show='!queryInProgress && !result.work.displayImageDataUrl'
+              )
+              span
+                i.fa.fa-close.fa-2x
+                br
+                | 加载失败
+                br
+                | 点击重新加载
+            .loading(:style='calTopPadding(result.work.height, result.work.width, !queryInProgress)' v-show='queryInProgress')
+              span
+                i.fa.fa-spinner.fa-pulse.fa-2x
+                br
+                | 加载中..
             header.illust-title
               h5 {{ result.work.title }}
             .user-meta(:title='\'pixiv id: \' + result.work.user.id')
@@ -27,18 +41,19 @@
   export default {
     name: 'main',
     components: { topbar, side, modalProgress: progress },
-    computed: mapState('pixiv', [
-      'queryResult'
-    ]),
+    computed: {
+      ...mapState('pixiv', [
+        'queryResult',
+        'queryInProgress'
+      ])
+    },
     methods: {
-      test () {
-        let accessToken = this.$store.getters['user/accessToken']
-        this.$store
-          .dispatch('pixiv/query', {
-            command: 'ByID',
-            illustId: 63709413,
-            accessToken
-          })
+      calTopPadding (height, width, ignore) {
+        if (ignore) return {}
+
+        return {
+          'padding-top': `${height / width * 100}%`
+        }
       }
     }
   }
@@ -69,6 +84,15 @@
     padding: 2%
     width: 90%
     background-color: rgb(77, 12 * 16 + 7, 160)
+  .load-failed
+    cursor: pointer
+  .load-failed, .loading
+    position: relative
+    span
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
   img.work
     display: inline-block
   .user-meta
@@ -83,6 +107,7 @@
       width: 35px
       height: 35px
       displsy: inline-block
+      background: rgba(0, 0, 0, 0.1)
     .name
       max-width: 100%
       padding-left: 10px
