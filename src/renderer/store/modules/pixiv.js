@@ -87,6 +87,7 @@ const actions = {
     try {
       let result = []
       let urls = getOriginalImageUrls(state.queryResult)
+      console.log(urls)
       commit(START_GET_IMAGES_DATA, urls.length)
       result = await getImages(
         urls,
@@ -127,12 +128,15 @@ function getOriginalImageUrls (selectResult) {
   return selectResult
     .map(
       imageObj => {
-        if (imageObj.page_count <= 1) {
-          return imageObj.meta_single_page.original_image_url
+        if (imageObj.work.page_count <= 1) {
+          return imageObj.work.image_urls.large
         } else {
-          return imageObj.meta_pages.map(
-            page => page.image_urls.original
-          )
+          const result = []
+          result[0] = imageObj.work.image_urls.large
+          for (let i = 1; i < imageObj.work.page_count; i++) {
+            result.push(imageObj.work.image_urls.large.replace(/_p0\./, `_p${i}.`))
+          }
+          return result
         }
       }
     )

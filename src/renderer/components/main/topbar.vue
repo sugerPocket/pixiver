@@ -38,7 +38,7 @@
           target.button('loading')
           this
             .$store
-            .dispatch('downloadOriginalImages', this.path + '/')
+            .dispatch('pixiv/downloadOriginalImages', this.path + '/')
             .then(() => target.button('reset'))
         }
       }
