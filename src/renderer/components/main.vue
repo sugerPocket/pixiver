@@ -11,7 +11,8 @@
             img.img-responsive.work(v-show='result.work.displayImageDataUrl' v-bind:src='result.work.displayImageDataUrl' v-bind:title='\'illust id: \' + result.work.id')
             .load-failed(
               :style='calTopPadding(result.work.height, result.work.width)'
-              v-show='!queryInProgress && !result.work.displayImageDataUrl'
+              v-show='!result.queryInProgress && !result.work.displayImageDataUrl'
+              @click='reloadOne(result)'
               )
               span
                 i.fa.fa-close.fa-2x
@@ -19,7 +20,7 @@
                 | 加载失败
                 br
                 | 点击重新加载
-            .loading(:style='calTopPadding(result.work.height, result.work.width, !queryInProgress)' v-show='queryInProgress')
+            .loading(:style='calTopPadding(result.work.height, result.work.width, !result.queryInProgress)' v-show='result.queryInProgress')
               span
                 i.fa.fa-spinner.fa-pulse.fa-2x
                 br
@@ -43,8 +44,7 @@
     components: { topbar, side, modalProgress: progress },
     computed: {
       ...mapState('pixiv', [
-        'queryResult',
-        'queryInProgress'
+        'queryResult'
       ])
     },
     methods: {
@@ -54,6 +54,9 @@
         return {
           'padding-top': `${height / width * 100}%`
         }
+      },
+      reloadOne (work) {
+        this.$store.dispatch('pixiv/loadOne', work)
       }
     }
   }
