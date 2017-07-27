@@ -3,8 +3,8 @@
     .navbar-header
       a.navbar-brand Pixiver
     .btn-group.navbar-right
-      button.btn.navbar-btn(@click='selectDir($event)' data-loading-text='选择中...') 选择目录
-      button.btn.navbar-btn(@click='download($event)' data-loading-text='正在导出...') 导出到本地
+      button.btn.navbar-btn(@click='selectDir($event)' data-loading-text='选择中... ') 选择目录
+      button.btn.navbar-btn(@click='download($event)' data-loading-text='正在导出...') &nbsp;导出到本地&nbsp;
     form.navbar-form.navbar-right(role="search")
       .form-group
         input.directory.form-control(v-model='path' placeholder="目录" disabled)
@@ -38,7 +38,7 @@
           target.button('loading')
           this
             .$store
-            .dispatch('downloadOriginalImages', this.path + '/')
+            .dispatch('pixiv/downloadOriginalImages', this.path + '/')
             .then(() => target.button('reset'))
         }
       }

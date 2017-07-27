@@ -3,21 +3,18 @@
   .modal-dialog
     .modal-content
       .modal-body
-        div.text-center.flex
-          .progress-data.failed
-            span failed  
-            span {{ failedItemsCount }}
-          h3.text 正在下载
-            span.dots
-              span.dot .
-              span.dot .
-              span.dot .
-          .progress-data.success
-            span success 
-            span {{ successItemsCount }} / {{ total }}
+        .progress-data(v-bind:style="{ transform: 'translateX(' + (computedProgress * 100 - 50) + '%)' }")
+          .progress-meta
+            | {{ computedProgress * 100 || 0 }}%
         .progress.progress-striped.progress-lg
           .progress-bar.progress-bar-success(role="progressbar" v-bind:aria-valuenow="successItemsCount" v-bind:aria-valuemin="0" v-bind:aria-valuemax="total" v-bind:style="{ width: '' + successItemsCount / total * 100 + '%' }")
           .progress-bar.progress-bar-danger(role="progressbar" v-bind:aria-valuenow="failedItemsCount" v-bind:aria-valuemin="0" v-bind:aria-valuemax="total" v-bind:style="{ width: '' + failedItemsCount / total * 100 + '%' }")
+        h4.text-center.flex
+          | 正在下载
+          span.dots
+            span.dot .
+            span.dot .
+            span.dot .
 </template>
 
 <script>
@@ -29,7 +26,10 @@ export default {
     inProgress: ({ pixiv }) => pixiv.downloadInProgress,
     total: ({ pixiv }) => pixiv.curDownImagesNum,
     successItemsCount: ({ pixiv }) => pixiv.curDownImagesSuccessCount,
-    failedItemsCount: ({ pixiv }) => pixiv.curDownImagesFailCount
+    failedItemsCount: ({ pixiv }) => pixiv.curDownImagesFailCount,
+    computedProgress ({ pixiv }) {
+      return Math.floor(pixiv.curDownImagesFailCount + pixiv.curDownImagesSuccessCount / pixiv.curDownImagesNum * 100) / 100
+    }
   }),
   watch: {
     inProgress (on, old) {
@@ -40,7 +40,7 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 @keyframes downloading
   0
     transform: translate(0,0)
@@ -48,6 +48,16 @@ export default {
     transform: translate(0,-2px)
   33%
     transform: translate(0,0)
+
+@keyframes progressing
+ 0%
+  background-position: 0px 0px
+ 100%
+  background-position: 0px -40px
+
+.modal-content
+  padding: 0 40px
+
 
 .download-progress
   position: absolute
@@ -57,69 +67,42 @@ export default {
     border-radius: 2px
     background-color: #2b3652
   .progress
-    height: 12px
+    background-color: darken(#2b3652, 5%)
+  .progress-bar
+    animation: progressing linear 0.5s 0.2s infinite
   .progress-bar-success
     background-color: #4dc7a0
-  div.flex
+  .flex
     display: flex
     align-items: center
-    justify-content: space-between
-    margin-bottom: 20px
-  .text
-    height: 100%
+    justify-content: center
+    margin-bottom: 5px
   .progress-data
+    text-align: center
+    transform: translateX(-50%)
+    transition: all 0.5s
+    .progress-meta
+      padding: 10px
+      border-radius: 5px
+      background: darken(#2b3652, 5%)
+      text-align: left
+    &:after
+      display: block
+      border-top: 10px solid darken(#2b3652, 5%)
+      border-left: 8px solid transparent
+      border-right: 8px solid transparent
+      margin: 0 auto
+      width: 0
+      content: " "
+  .progress-meta
     border-radius: 50%
     text-align: center
     display: inline-block
     position: relative
-    &.success
-      right: 0
-      background-color: #4dc7a0
-      height: 140px
-      width: 140px
-      &:before
-        background: rgba(77, 12 * 16 + 7, 160, 0.15)
-        content: ""
-        height: 100%
-        position: absolute
-        top: 5px
-        border-radius: 50px
-        filter: blur(18px)
-        right: -5px
-        left: -5px
-      & > span
-        display: block
-      & > span:nth-child(1)
-        font-size: 20px
-        line-height: 50px
-      & > span:nth-child(2)
-        font-size: 36px
-    &.failed
-      background-color: #d9534f
-      height: 84px
-      width: 84px
-      &:before
-        background: rgba(14 * 16 + 9, 83, 79, 0.15)
-        content: ""
-        height: 100%
-        position: absolute
-        top: 5px
-        border-radius: 50px
-        filter: blur(18px)
-        right: -5px
-        left: -5px
-      & > span
-        display: block
-      & > span:nth-child(1)
-        font-size: 16px
-        line-height: 36px
-      & > span:nth-child(2)
-        font-size: 32px
   
   .dots
     .dot
       display: inline-block
-      font-size: 40px
     .dot:nth-child(1)
       animation: downloading 1s 0.2s infinite
     .dot:nth-child(2)

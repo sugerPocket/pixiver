@@ -4,14 +4,14 @@
     h1 排名
     h3 查询配置
   section
-    component(:is="mode" v-bind:dispatchConfigs="getConfigs") 
+    component(:is="mode" @queryBegin='' v-bind:dispatch="fetch") 
   footer
     button.btn.btn-block.btn-success(@click='fetch($event)' data-loading-text='正在查找...') 查找图片
     
 </template>
 
 <script>
-import rank from './side/rank'
+import ranking from './side/ranking'
 
 export default {
   name: 'side',
@@ -19,25 +19,25 @@ export default {
     return {
       path: '',
       configs: {},
-      mode: 'rank',
+      mode: 'ranking',
       getConfigs () {}
     }
   },
   methods: {
+
     fetch ($event) {
+      let configs = this.$store.getters[`configs/${this.mode}/query`]
+      let accessToken = this.$store.getters['user/accessToken']
       let target = $($event.target)
       target.button('loading')
-      this.$store.dispatch('query', {
-        command: 'ByRank',
-        mode: 'day',
-        from: 0,
-        to: 10
-      })
-      .then(() => target.button('reset'))
+      this
+        .$store
+        .dispatch('pixiv/query', { ...configs, accessToken })
+        .then(() => target.button('reset'))
     }
   },
   components: {
-    rank
+    ranking
   }
 }
 </script>
@@ -52,7 +52,6 @@ export default {
     height: 90vh
     padding-right: 40px
     @media (max-height: 720px)
-      margin: 5%
       height: 90%
     //background-color: #44495f//#2f3241//#2b2e3b
     width: 335px
@@ -64,6 +63,7 @@ export default {
     section
       flex-grow: 1
       overflow-y: scroll
+      overflow-x: hidden
       &::-webkit-scrollbar
         width: 8px
       &::-webkit-scrollbar-thumb

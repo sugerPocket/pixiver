@@ -3,11 +3,33 @@
     modal-progress
     .wrapper
       topbar
-      section.illusts-wrapper.clearfix
-        .none-img(v-show="!displayImagesData.length")
+      section.illusts-wrapper.row.clearfix
+        .none-img(v-show="!queryResult.length")
           h1 There are no image
-        .illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4(v-for='url in displayImagesData')
-          img.img-responsive(v-bind:src='url')
+        section.illust-item.col-xs-12.col-sm-12.col-lg-4.col-md-4.text-center(v-for='result in queryResult')
+          .illust-container
+            img.img-responsive.work(v-show='result.work.displayImageDataUrl' v-bind:src='result.work.displayImageDataUrl' v-bind:title='\'illust id: \' + result.work.id')
+            .load-failed(
+              :style='calTopPadding(result.work.height, result.work.width)'
+              v-show='!result.queryInProgress && !result.work.displayImageDataUrl'
+              @click='reloadOne(result)'
+              )
+              span
+                i.fa.fa-close.fa-2x
+                br
+                | 加载失败
+                br
+                | 点击重新加载
+            .loading(:style='calTopPadding(result.work.height, result.work.width, !result.queryInProgress)' v-show='result.queryInProgress')
+              span
+                i.fa.fa-spinner.fa-pulse.fa-2x
+                br
+                | 加载中..
+            header.illust-title
+              h5 {{ result.work.title }}
+            .user-meta(:title='\'pixiv id: \' + result.work.user.id')
+              img.profile(v-bind:src='result.work.user.proflieImageDataUrl')
+              span.name {{ result.work.user.name }}
     side.hidden-xs.side
 </template>
 
@@ -20,9 +42,23 @@
   export default {
     name: 'main',
     components: { topbar, side, modalProgress: progress },
-    computed: mapState({
-      displayImagesData: state => state.pixiv.displayImagesData
-    })
+    computed: {
+      ...mapState('pixiv', [
+        'queryResult'
+      ])
+    },
+    methods: {
+      calTopPadding (height, width, ignore) {
+        if (ignore) return {}
+
+        return {
+          'padding-top': `${height / width * 100}%`
+        }
+      },
+      reloadOne (work) {
+        this.$store.dispatch('pixiv/loadOne', work)
+      }
+    }
   }
 </script>
 
@@ -32,15 +68,52 @@
   .main
     display: flex
     height: 100vh
-    min-height: 720px
+    min-height: 563px
     justify-content: space-between
   .illust-item
+    display: inline-block
+    vertical-align: top
+    float: none
     margin-bottom: 50px
-    //background-color: #4dc7a0
     border-radius: 3px
-    img
-      width: 90%
-      margin: 0 5%
+  .illust-title
+    & > h5
+      white-space: nowrap
+      text-overflow : ellipsis
+      overflow: hidden
+  .illust-container
+    display: inline-block
+    border-radius: 1%
+    padding: 2%
+    width: 90%
+    background-color: rgb(77, 12 * 16 + 7, 160)
+  .load-failed
+    cursor: pointer
+  .load-failed, .loading
+    position: relative
+    span
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+  img.work
+    display: inline-block
+  .user-meta
+    display: inline-block
+    margin-bottom: 5px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow : ellipsis
+    max-width: 100%
+    img.profile
+      border-radius: 10%
+      width: 35px
+      height: 35px
+      displsy: inline-block
+      background: rgba(0, 0, 0, 0.1)
+    .name
+      max-width: 100%
+      padding-left: 10px
   .wrapper
     display: flex
     flex-direction: column
@@ -50,25 +123,24 @@
     margin: 5vh
     padding-bottom: 10px
     height: 90vh
-    @media (max-height: 720px)
-      margin: 5%
-      height: 90%
+    min-height: 90%
     @media (max-width: 767px)
       height: 100%
       margin: 0
+    @media (min-width: 767px)
+      &:before, &:after
+        background: rgba(43, 54, 82, 0.3)
+        content: ""
+        height: 100%
+        position: absolute
+        top: 5px
+        border-radius: 50px
+        z-index: -1
+        filter: blur(14px)
+        left: -5px
+        right: -5px
     border-radius: 2px
     position: relative
-    &:before, &:after
-      background: rgba(43, 54, 82, 0.3)
-      content: ""
-      height: 100%
-      position: absolute
-      top: 5px
-      border-radius: 50px
-      z-index: -1
-      filter: blur(14px)
-      left: -5px
-      right: -5px
   .side
     flex-grow: 0
     flex: 0 0 335px

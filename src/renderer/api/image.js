@@ -1,15 +1,53 @@
 import request from 'superagent'
 import { isArray, isFunction } from '../utils'
 
+const MAX_REQUEST_NUM = 10
+
+/**
+ * 请求等待队列
+ * @type {Array<function(value: any=): void>}
+ */
+let waitQueue = []
+let curReqNum = 0
+
+async function reqLock () {
+  console.log(curReqNum >= MAX_REQUEST_NUM)
+  if (curReqNum >= MAX_REQUEST_NUM) {
+    console.log('A task push into queue!')
+    await new Promise(resolve => {
+      waitQueue.push(resolve)
+    })
+  }
+  curReqNum++
+  return true
+}
+
+function unlockOneReq (result) {
+  if (waitQueue.length) {
+    waitQueue.shift()(true)
+  }
+  curReqNum--
+  console.log('Unlock one task! The number of request is: ', curReqNum)
+  if (result instanceof Error) {
+    console.log('Unexpected error: ', result)
+    throw result
+  }
+  return result
+}
+
 /**
  * 查看获取单个 image
  *
  * @param {String} url 请求 image 的 url
  */
-export function getSingleImage (url) {
+export async function getSingleImage (url) {
+  await reqLock()
+  console.log('The number of current request number:', curReqNum)
   return request
     .get(url)
     .set('Referer', 'https://app-api.pixiv.net/')
+    .then(unlockOneReq)
+    .catch(unlockOneReq)
     .then(result => {
       result.filename = result.request.url.split('/').reverse()[0]
       return result

@@ -4,7 +4,7 @@ import fs from 'fs'
  * 检测对象是否是数组
  *
  * @param {any} object 需要检测的对象
- * @returns Boolean
+ * @returns {Boolean}
  */
 export function isArray (object) {
   return Object.prototype.toString.call(object) === '[object Array]'
@@ -53,7 +53,7 @@ async function writeFile (path, file) {
  *
  * @param {String} path 文件目录
  * @param {File} file 需要导出的文件
- * @returns Promise<Boolean>
+ * @returns {Promise<Boolean>}
  */
 function exportSingleFile (path, file) {
   return writeFile(path, file)
@@ -64,7 +64,7 @@ function exportSingleFile (path, file) {
  *
  * @param {String} path 文件目录
  * @param {Array<File>} files 文件对象数组
- * @return Promise<Boolean[]>
+ * @return {Promise<Boolean[]>}
  */
 function exportMultiFiles (path, files) {
   return Promise.all(
@@ -93,9 +93,30 @@ export function exportFiles (path, files, onItemSuccess, onItemFailed) {
 /**
  * 将日期转化为参数字符串
  *
+ * @export utils/transformDate
  * @param {Date} date 需要转换的日期
  * @return {String} 参数字符串 YYYY-MM-DD
  */
 export function transformDate (date) {
-  return date ? `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}` : null
+  if (!date) return ''
+  let year = date.getFullYear()
+  let month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1)
+  let day = (date.getDate() < 10 ? '0' : '') + date.getDate()
+  return date ? `${year}-${month}-${day}` : null
+}
+
+/**
+ * 判断是不是今日
+ *
+ * @export utils/isToday
+ * @param {Date} date
+ * @return {Boolean} true or false
+ */
+export function lessThanToday (date) {
+  let now = new Date(Date.now())
+  let year = date.getFullYear() === now.getFullYear()
+  let month = date.getMonth() === now.getMonth()
+  let day = date.getDate() === now.getDate()
+
+  return (!year || !month || !day) && date < now
 }

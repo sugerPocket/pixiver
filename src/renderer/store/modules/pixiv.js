@@ -3,28 +3,24 @@ import { getImages, getSingleImage } from '../../api/image'
 import { isFunction, exportFiles, isArray } from '../../utils'
 
 const state = {
-  displayImagesData: [],
   queryResult: [],
   curDownImagesNum: 0,
   curDownImagesSuccessCount: 0,
-  curDownImagesFailCount: 0,
-  downloadInProgress: false
+  curDownImagesFailCount: 0
 }
 
 const UPDATE_QUERY_RESULT = 'UPDATE_QUERY_RESULT'
-const UPDATE_DISPLAY_IMAGES_DATA = 'UPDATE_DISPLAY_IMAGES_DATA'
 const GET_ONE_IMAGE_SUCCESS = 'GET_ONE_IMAGE_SUCCESS'
 const GET_ONE_IMAGE_FAIL = 'GET_ONE_IMAGE_FAIL'
 const TOGGLE_ILLUST_SELECTED_STATE = 'TOGGLE_ILLUST_SELECTED_STATE'
 const START_GET_IMAGES_DATA = 'START_GET_IMAGES_DATA'
 const END_GET_IMAGES_DATA = 'END_GET_IMAGES_DATA'
+const QUERY_ITEM_START = 'QUERY_ITEM_START'
+const QUERY_ITEM_END = 'QUERY_ITEM_END'
 
 const mutations = {
   [UPDATE_QUERY_RESULT] (state, result) {
     state.queryResult = result
-  },
-  [UPDATE_DISPLAY_IMAGES_DATA] (state, imagesData) {
-    state.displayImagesData = imagesData
   },
   [GET_ONE_IMAGE_SUCCESS] (state) {
     state.curDownImagesSuccessCount ++
@@ -43,6 +39,43 @@ const mutations = {
   },
   [TOGGLE_ILLUST_SELECTED_STATE] (state, index) {
     state.queryResult[index].selected = !state.queryResult[index].selected
+  },
+  [QUERY_ITEM_START] (state, workObj) {
+    let position = state.queryResult.indexOf(workObj)
+    if (position === -1) return
+    state
+      .queryResult[position]
+      .queryInProgress = true
+  },
+  [QUERY_ITEM_END] (state, data) {
+    let { workObj, displayImgData, profileImgData } = data
+    let position = state.queryResult.indexOf(workObj)
+    let { queryResult } = state
+    if (position === -1) return
+    let workItem = queryResult[position]
+    if (displayImgData) {
+      workItem
+        .work
+        .displayImageDataUrl = URL.createObjectURL(
+          new Blob([displayImgData.body], {
+            type: displayImgData.type
+          })
+        )
+    }
+
+    if (profileImgData) {
+      workItem
+        .work
+        .user
+        .proflieImageDataUrl = URL.createObjectURL(
+          new Blob([profileImgData.body], {
+            type: profileImgData.type
+          })
+        )
+    }
+
+    workItem.queryInProgress = false
+    state.queryResult.splice(position, 1, Object.assign({}, workItem))
   }
 }
 
@@ -57,29 +90,26 @@ const actions = {
     result = await dispatch('getDisplayImagesData')
     return result
   },
-  async getDisplayImagesData ({ commit, state }) {
+  async getDisplayImagesData ({ commit, state, dispatch }) {
     let result = []
-    // TODO: get data from cache
-    result = await Promise.all(getDisplayImageUrls(state.queryResult)
-      .map(url => {
-        return getSingleImage(url)
-          .then(result => URL.createObjectURL(new Blob([result.body], { type: result.type })))
-          .catch(err => console.log(err))
-      })
+    result = await Promise.all(
+      state
+        .queryResult
+        .map(async workObj => {
+          return dispatch('loadOne', workObj)
+        })
     )
 
-    commit(UPDATE_DISPLAY_IMAGES_DATA, result)
     return result.filter(data => !!data)
   },
   async downloadOriginalImages ({ commit, state }, path) {
     try {
       let result = []
-      // TODO: get data from cache
       let urls = getOriginalImageUrls(state.queryResult)
+      console.log(urls)
       commit(START_GET_IMAGES_DATA, urls.length)
       result = await getImages(
         urls,
-        // TODO: progress bar
         result => commit(GET_ONE_IMAGE_SUCCESS),
         err => {
           console.error(err)
@@ -94,17 +124,24 @@ const actions = {
     } finally {
       commit(END_GET_IMAGES_DATA)
     }
+  },
+  async loadOne ({ commit, state }, workObj) {
+    if (!state.queryResult || !workObj) {
+      return Promise.reject(Error('unknown works meta!'))
+    }
+    let displayImgData, profileImgData
+    commit(QUERY_ITEM_START, workObj)
+    try {
+      displayImgData = await getSingleImage(workObj.work.image_urls.px_480mw)
+      profileImgData = await getSingleImage(workObj.work.user.profile_image_urls.px_50x50)
+    } catch (e) {}
+    commit(QUERY_ITEM_END, {
+      workObj,
+      displayImgData,
+      profileImgData
+    })
+    return workObj
   }
-}
-
-/**
- * 获取 每个查询记录的 展示图片的 url
- *
- * @param {Array<object>} queryResult api 查询结果
- * @return {Array<String | String[]>}
- */
-function getDisplayImageUrls (queryResult) {
-  return queryResult.map(imageObj => imageObj.image_urls.square_medium)
 }
 
 /**
@@ -116,13 +153,16 @@ function getDisplayImageUrls (queryResult) {
 function getOriginalImageUrls (selectResult) {
   return selectResult
     .map(
-      imageObj => {
-        if (imageObj.page_count <= 1) {
-          return imageObj.meta_single_page.original_image_url
+      workObj => {
+        if (workObj.work.page_count <= 1) {
+          return workObj.work.image_urls.large
         } else {
-          return imageObj.meta_pages.map(
-            page => page.image_urls.original
-          )
+          const result = []
+          result[0] = workObj.work.image_urls.large
+          for (let i = 1; i < workObj.work.page_count; i++) {
+            result.push(workObj.work.image_urls.large.replace(/_p0\./, `_p${i}.`))
+          }
+          return result
         }
       }
     )
