@@ -8,13 +8,13 @@ const mutations = {
 }
 
 const actions = {
-    getQueryConfigs({ state }, mode) {
-        return state[mode] || {}
-    }
+  getQueryConfigs ({ state }, mode) {
+    return state[mode] || {}
+  }
 }
 
 export default {
-    state,
-    mutations,
-    actions
+  state,
+  mutations,
+  actions
 }

@@ -21,30 +21,27 @@ export default {
     }
   },
   methods: {
-    login ($event) {
+    async login ($event) {
       let btn = $($event.target).find('button[type=submit]')
       btn.button('loading')
       let data = {
         password: this.password,
         username: this.username
       }
-      this.$store
-        .dispatch('user/login', data)
-        .then(result => {
-          this.$router.push('/home')
-          localStorage.setItem('$pixiver', JSON.stringify(Object.assign({}, result, data)))
-        })
-        .catch(err => console.log(err))
-        .then(data => {
-          btn.button('reset')
-          return data
-        })
+      try {
+        const result = await this.$store.dispatch('user/login', data)
+        this.$router.push('/home')
+        localStorage.setItem('$pixiver', JSON.stringify(Object.assign({}, result, data)))
+      } catch (e) {
+        console.error(e)
+      }
+      btn.button('reset')
     }
   }
 }
 </script>
 
-<style lang='sass' scoped>
+<style lang='stylus' scoped>
   #logo 
     height: auto
     margin-bottom: 20px

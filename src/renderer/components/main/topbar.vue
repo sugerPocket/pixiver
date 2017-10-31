@@ -32,21 +32,21 @@
           target.button('reset')
         })
       },
-      download ($event) {
+      async download ($event) {
         if (this.path) {
           let target = $($event.target)
           target.button('loading')
-          this
+          await this
             .$store
             .dispatch('pixiv/downloadOriginalImages', this.path + '/')
-            .then(() => target.button('reset'))
+          target.button('reset')
         }
       }
     }
   }
 </script>
 
-<style scoped lang='sass'>
+<style scoped lang='stylus'>
   .navbar
     padding: 0 15px
     background-color: #2b2e3b

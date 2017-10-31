@@ -18,16 +18,15 @@ async function byRank ({ date, mode, from, to, type, accessToken }) {
   }
   if (date) query.date = date
 
-  return PixivRequest
-    .get(`ranking/${type}`, query)
-    .then(result => {
-      console.log(result)
-      return result.body.response[0].works.slice(from)
-    })
-    .catch(response => {
-      console.log(response)
-      return []
-    })
+  let result = []
+  try {
+    result = await PixivRequest.get(`ranking/${type}`, query)
+    console.log(result)
+    result = result.body.response[0].works.slice(from)
+  } catch (e) {
+    console.err(e)
+  }
+  return result
 }
 
 async function byAuthor () {
@@ -35,25 +34,20 @@ async function byAuthor () {
 }
 
 async function byID ({ illustId, accessToken }) {
-  return request
-    .get(`https://public-api.secure.pixiv.net/v1/works/${illustId}`)
-    .set('Authorization', `Bearer ${accessToken}`)
-    .set('Referer', 'http://spapi.pixiv-app.net/')
-    .set('Host', 'public-api.secure.pixiv.net')
-    .query({
-      include_sanity_level: true,
-      profile_image_sizes: 'px_50x50',
-      include_stats: true,
-      image_sizes: 'large'
-    })
-    .then(result => {
-      console.log(result)
-      return result
-    })
-    .catch(result => {
-      console.log(result)
-      return {}
-    })
+  let query = {
+    include_sanity_level: true,
+    profile_image_sizes: 'px_50x50',
+    include_stats: true,
+    image_sizes: 'large'
+  }
+  let result = {}
+  try {
+    result = await PixivRequest.get(`works/${illustId}`, query)
+    console.log(result)
+  } catch (e) {
+    console.error(e)
+  }
+  return result
 }
 
 export default {

@@ -39,6 +39,9 @@ export class PixivRequest {
   }
 }
 
+/**
+ * 
+ */
 export function setAccessToken (token) {
   DEFAULT_HEADERS.Authorization = `Bearer ${token}`
 }

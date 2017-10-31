@@ -27,13 +27,11 @@ const getters = {
 }
 
 const actions = {
-  login ({ commit }, data) {
+  async login ({ commit }, data) {
     let { username, password } = data
-    return login(username, password)
-      .then(result => {
-        commit(AUTH_SUCCESS, Object.assign({ username, password }, result.body.response))
-        return result.body.response
-      })
+    const result = await login(username, password)
+    commit(AUTH_SUCCESS, Object.assign({ username, password }, result.body.response))
+    return result.body.response
   }
 }
 

@@ -23,7 +23,7 @@ const mutations = {
     state.queryResult = result
   },
   [GET_ONE_IMAGE_SUCCESS] (state) {
-    state.curDownImagesSuccessCount ++
+    state.curDownImagesSuccessCount++
   },
   [START_GET_IMAGES_DATA] (state, total) {
     state.curDownImagesNum = total
@@ -35,7 +35,7 @@ const mutations = {
     state.downloadInProgress = false
   },
   [GET_ONE_IMAGE_FAIL] (state) {
-    state.curDownImagesFailCount ++
+    state.curDownImagesFailCount++
   },
   [TOGGLE_ILLUST_SELECTED_STATE] (state, index) {
     state.queryResult[index].selected = !state.queryResult[index].selected

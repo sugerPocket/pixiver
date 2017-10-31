@@ -62,7 +62,7 @@
   }
 </script>
 
-<style lang='sass'>
+<style lang='stylus'>
   body
     background: linear-gradient(to bottom right, #d9f46b, #4dc7a0 80%)
   .main

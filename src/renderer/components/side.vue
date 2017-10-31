@@ -25,15 +25,15 @@ export default {
   },
   methods: {
 
-    fetch ($event) {
+    async fetch ($event) {
       let configs = this.$store.getters[`configs/${this.mode}/query`]
       let accessToken = this.$store.getters['user/accessToken']
       let target = $($event.target)
       target.button('loading')
-      this
+      await this
         .$store
         .dispatch('pixiv/query', { ...configs, accessToken })
-        .then(() => target.button('reset'))
+      target.button('reset')
     }
   },
   components: {
@@ -42,7 +42,7 @@ export default {
 }
 </script>
 
-<style lang='sass'>
+<style lang='stylus'>
   .side
     display: flex
     flex-direction: column

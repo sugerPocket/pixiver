@@ -40,7 +40,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="stylus" scoped>
 @keyframes downloading
   0
     transform: translate(0,0)
